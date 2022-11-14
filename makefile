@@ -137,17 +137,17 @@ $(buildDir)/set-project-var:cmd/set-project-var/set-project-var.go
 set-var:$(buildDir)/set-var
 set-project-var:$(buildDir)/set-project-var
 set-smoke-vars:$(buildDir)/.load-smoke-data
-	@./bin/set-project-var -dbName mci_smoke -key aws_key -value $(AWS_KEY)
-	@./bin/set-project-var -dbName mci_smoke -key aws_secret -value $(AWS_SECRET)
-	@./bin/set-var -dbName=mci_smoke -collection=hosts -id=localhost -key=agent_revision -value=$(agentVersion)
-	@./bin/set-var -dbName=mci_smoke -collection=pods -id=localhost -key=agent_version -value=$(agentVersion)
+	@./bin/set-project-var -dbName mci_smoke -key aws_key -value $(AWS_KEY) $(if $(DBHOST),--dbHost $(DBHOST),)
+	@./bin/set-project-var -dbName mci_smoke -key aws_secret -value $(AWS_SECRET) $(if $(DBHOST),--dbHost $(DBHOST),)
+	@./bin/set-var -dbName=mci_smoke -collection=hosts -id=localhost -key=agent_revision -value=$(agentVersion) $(if $(DBHOST),--dbHost $(DBHOST),)
+	@./bin/set-var -dbName=mci_smoke -collection=pods -id=localhost -key=agent_version -value=$(agentVersion) $(if $(DBHOST),--dbHost $(DBHOST),)
 load-smoke-data:$(buildDir)/.load-smoke-data
 load-local-data:$(buildDir)/.load-local-data
 $(buildDir)/.load-smoke-data:$(buildDir)/load-smoke-data
 	./$<
 	@touch $@
 $(buildDir)/.load-local-data:$(buildDir)/load-smoke-data
-	./$< -path testdata/local -dbName evergreen_local -amboyDBName amboy_local
+	./$< -path testdata/local -dbName evergreen_local -amboyDBName amboy_local $(if $(DBHOST),--dbHost $(DBHOST),)
 	@touch $@
 smoke-test-agent-monitor:$(localClientBinary) load-smoke-data
 	./$< service deploy start-evergreen --web --binary ./$< &

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"time"
 
@@ -18,18 +19,21 @@ func main() {
 		project string
 		key     string
 		value   string
+		dbHost  string
 	)
 
 	flag.StringVar(&dbName, "dbName", "mci_smoke", "database name for directory")
 	flag.StringVar(&project, "project", "evergreen", "name of project")
 	flag.StringVar(&key, "key", "", "key to set")
 	flag.StringVar(&value, "value", "", "value of key")
+	flag.StringVar(&dbHost, "dbHost", "localhost", "host for db")
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017").SetConnectTimeout(5*time.Second))
+	dbURI := fmt.Sprintf("mongodb://%s:27017", dbHost)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURI).SetConnectTimeout(5*time.Second))
 	grip.EmergencyFatal(err)
 
 	res, err := client.Database(dbName).Collection("project_vars").UpdateOne(ctx, bson.M{"_id": project}, bson.M{"$set": bson.M{"vars." + key: value}})

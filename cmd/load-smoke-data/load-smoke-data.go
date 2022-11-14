@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -211,18 +212,20 @@ func main() {
 		dbName      string
 		logsDBName  string
 		amboyDBName string
+		dbHost      string
 	)
 
 	flag.StringVar(&path, "path", filepath.Join(wd, "testdata", "smoke"), "load data from json files from these paths")
 	flag.StringVar(&dbName, "dbName", "mci_smoke", "database name for directory")
 	flag.StringVar(&logsDBName, "logsDBName", "logs", "logs database name for directory")
 	flag.StringVar(&amboyDBName, "amboyDBName", "amboy_smoke", "name of the Amboy DB to use")
+	flag.StringVar(&dbHost, "dbHost", "localhost", "host for DB")
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	const dbURI = "mongodb://localhost:27017"
+	dbURI := fmt.Sprintf("mongodb://%s:27017", dbHost)
 
 	clientOptions := options.Client().ApplyURI(dbURI).SetConnectTimeout(5 * time.Second)
 	envAuth := os.Getenv(evergreen.MongodbAuthFile)

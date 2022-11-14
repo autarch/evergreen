@@ -1,0 +1,12 @@
+version: '3'
+services:
+  evergreen:
+    image: evergreen
+    ports:
+      - 9090:9090
+  mongo:
+    image: mongo:6.0
+  spruce:
+    image: spruce
+    ports:
+      - 3000:80
