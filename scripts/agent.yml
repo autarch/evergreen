@@ -91,7 +91,7 @@ tasks:
           script: |
             set -o verbose
             set -o errexit
-            echo "smoked"
+            echo "smoked again"
 
             # files to archive.targz_pack
             mkdir archive
